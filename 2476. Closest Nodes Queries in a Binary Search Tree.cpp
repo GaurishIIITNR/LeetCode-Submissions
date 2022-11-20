@@ -12,32 +12,51 @@
 class Solution
 {
 public:
-    vector<int> dfs(TreeNode *root, int &a, int &b, int q)
+    void dfs(TreeNode *root, vector<int> &v)
     {
-        if (root->val <= q)
-            a = max(a, root->val);
-        if (root->val >= q)
-            b = min(b, root->val);
+        // if(root->left==NULL && root->right==NULL )
+        //     return ;
+        v.push_back(root->val);
         if (root->left != NULL)
-        {
-            dfs(root->left, a, b, q);
-        }
+            dfs(root->left, v);
         if (root->right != NULL)
-        {
-            dfs(root->right, a, b, q);
-        }
-        return {a, b};
+            dfs(root->right, v);
+        return;
     }
     vector<vector<int>> closestNodes(TreeNode *root, vector<int> &v)
     {
+        vector<int> r;
         vector<vector<int>> res;
+        dfs(root, r);
+        sort(r.begin(), r.end());
         for (int i = 0; i < v.size(); i++)
         {
+            int l = 0, h = r.size() - 1;
+            while (l < h)
+            {
+                int m = l + (h - l + 1) / 2;
+                if (r[m] <= v[i])
+                    l = m;
+                else
+                    h = m - 1;
+            }
+            int a = -1;
+            if (r[l] <= v[i])
+                a = r[l];
 
-            int a = -1, b = INT_MAX;
-            dfs(root, a, b, v[i]);
-            if (b == INT_MAX)
-                b = -1;
+            l = 0, h = r.size() - 1;
+            while (l < h)
+            {
+                int m = l + (h - l) / 2;
+                if (r[m] >= v[i])
+                    h = m;
+                else
+                    l = m + 1;
+            }
+            int b = -1;
+            if (r[l] >= v[i])
+                b = r[l];
+
             res.push_back({a, b});
         }
         return res;
